@@ -1,0 +1,35 @@
+import { Paginator } from "../z-library/HTTP/http-response";
+import { Accessible } from "../z-library/bases/accessible";
+import { Model } from "mongoose";
+import { HydratedDocument } from "mongoose";
+
+export class DataAccess implements Accessible {
+
+    //Replace the Object type in HydratedDocument generic to a custom Raw data type
+
+    public model: Model<any>
+
+    constructor(model: Model<any>){
+        this.model = model
+    }
+    
+    public createNew = (data: Object): Promise<HydratedDocument<Object>> =>{
+        return this.model.create(data)
+    }
+
+    public findByReferenceId = async(refId: string): Promise<HydratedDocument<Object> | null> =>{
+        return await this.model.findById(refId)
+    }
+    public findWithPagination = async(paginator: Paginator): Promise<HydratedDocument<Object>[]> => {
+        return await this.model.find().skip(paginator.skipDocs).limit(paginator.limit)
+    }
+
+    public findByIdAndUpdate = async(id: string, updateDoc: any):Promise<HydratedDocument<Object> | null> =>{
+        return await this.model.findByIdAndUpdate(id, updateDoc)
+    }
+
+    public findByIdAndDelete = async(id: string): Promise<HydratedDocument<Object> | null> =>{
+        return await this.model.findByIdAndDelete(id)
+    }
+
+}
